@@ -10,6 +10,35 @@
     "commit": "ffa75c8b2bede153844195479abeff01f3e34227"
   },
   "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.21.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.21.2",
+    "@babel/preset-env": "^7.21.4",
     "eslint": "^8.39.0"
-  }
+  },
+  "description": "## Índice",
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "eslint-scope": "^7.2.0",
+    "eslint-visitor-keys": "^3.4.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": " ",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdrianaKatarina/SAP009-md-links.git"
+  },
+  "author": "Adriana",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/AdrianaKatarina/SAP009-md-links/issues"
+  },
+  "homepage": "https://github.com/AdrianaKatarina/SAP009-md-links#readme"
 }
