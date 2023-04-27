@@ -12,13 +12,14 @@ const extrairInformacoes = (string, arquivo) => {
 };
 
 export const mdLinks = (caminhoDoArquivo) => {
-  const encode = 'utf-8';
-  const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
-  readFile(caminhoDoArquivo,encode, (err, data) => {
-    if (err) throw err;
-      const conteudo = data.match(regex);
-      const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
-      console.log(informacoes);
-    }); 
+  return new Promise((resolve, reject) => {
+    const encode = 'utf-8';
+    const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
+    readFile(caminhoDoArquivo,encode, (err, data) => {
+      if (err) throw reject(err);
+        const conteudo = data.match(regex);
+        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+        resolve(informacoes);
+      });
+  })
 };
-mdLinks('src/texto.md');
