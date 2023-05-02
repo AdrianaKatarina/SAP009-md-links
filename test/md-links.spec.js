@@ -1,6 +1,9 @@
-import { extrairInformacoes } from '../src/md-links';
+import { extrairInformacoes, mdLinks, callback } from '../src/md-links';
+import { readFile } from 'node:fs';
 
-describe('pegaArquivo::', () => {
+jest.mock('node:fs')
+
+describe('pegaArquivo', () => {
   it('Deve retornar a formatação link, texto e arquivo ', () => {
     const text = 'Markdown';
     const href = 'https://pt.wikipedia.org/wiki/Markdown';
@@ -12,3 +15,27 @@ describe('pegaArquivo::', () => {
     expect(info).toEqual({href, text, file});
   })
 })
+
+/* describe('função md-links', () => {
+  it('deve resolver e retornar um array de objeto', () => {
+    readFile.mockResolvedValueOnce();
+    const encode = 'utf-8';
+    const caminhoDoArquivo = 'text.md';
+    mdLinks(caminhoDoArquivo);
+
+    expect(readFile).toHaveBeenCalledTimes(1);
+    expect(readFile).toHaveBeenCalledWith(caminhoDoArquivo,encode,callback);
+  })
+}) */
+
+describe('função md-links', () => {
+  it('deve resolver e retornar um array de objeto', () => {
+    readFile.mockResolvedValueOnce();
+    const encode = 'utf-8';
+    const caminhoDoArquivo = 'text.md';
+    mdLinks(caminhoDoArquivo);
+
+    expect(readFile).toHaveBeenCalledTimes(1);
+    expect(readFile).toHaveBeenCalledWith(caminhoDoArquivo, encode, callback);
+  })
+}) 

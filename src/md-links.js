@@ -11,15 +11,45 @@ export const extrairInformacoes = (string, arquivo) => {
   };
 };
 
-export const mdLinks = (caminhoDoArquivo) => {
+/* export const mdLinks = (caminhoDoArquivo) => {
   return new Promise((resolve, reject) => {
     const encode = 'utf-8';
     const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
     readFile(caminhoDoArquivo,encode, (err, data) => {
       if (err) throw reject(err);
-        const conteudo = data.match(regex);
-        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
-        resolve(informacoes);
-      });
+      const conteudo = data.match(regex);
+      const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+      resolve(informacoes);
+    });
+  });
+}; */
+
+
+/* export const mdLinks = (caminhoDoArquivo) => {
+  return new Promise((resolve, reject) => {
+    const encode = 'utf-8';
+    readFile(caminhoDoArquivo,encode, callback);
   })
 };
+
+export const callback = (err, data) => {
+  if (err) throw reject(err);
+  const conteudo = data.match(regex);
+  const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+  resolve(informacoes);
+} */
+
+export const mdLinks = (caminhoDoArquivo) => {
+  return new Promise((resolve, reject) => {
+    const encode = 'utf-8';
+    const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
+    readFile(caminhoDoArquivo,encode, callback);
+  })
+};
+
+export const callback = (err, data) => {
+  if (err) throw reject(err);
+  const conteudo = data.match(regex);
+  const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+  resolve(informacoes);
+}
