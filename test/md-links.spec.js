@@ -16,29 +16,13 @@ describe('pegaArquivo', () => {
   })
 })
 
-/* describe('função md-links', () => {
-  it('deve resolver e retornar um array de objeto', () => {
-    readFile.mockResolvedValueOnce();
-    const encode = 'utf-8';
-    const caminhoDoArquivo = 'text.md';
-    mdLinks(caminhoDoArquivo);
-
-    expect(readFile).toHaveBeenCalledTimes(1);
-    expect(readFile).toHaveBeenCalledWith(caminhoDoArquivo,encode,callback);
-  })
-}) */
-
 describe('função md-links', () => {
   it('deve resolver e retornar um array de objeto', () => {
-    let cb;
-    readFile.mockImplementation((path, options, callback) =>{
-      cb = callback;
-    });
     const encode = 'utf-8';
     const caminhoDoArquivo = 'text.md';
     mdLinks(caminhoDoArquivo);
 
     expect(readFile).toHaveBeenCalledTimes(1);
-    expect(readFile).toHaveBeenCalledWith(caminhoDoArquivo, encode, cb);
+    expect(readFile).toHaveBeenCalledWith(caminhoDoArquivo, encode, expect.any(Function));
   })
 }) 
