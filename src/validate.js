@@ -30,9 +30,9 @@ export const validateFuncions = (informacoes) => {
 }; */
 
 // Solicitação GET.
-/* fetch('https://nodejs.or/')
+fetch('https://nodejs.or/')
     .then(response => console.log(response.status))
-    .catch(err => console.log('Erro de solicitação', err));  */
+    .catch(err => console.log('Erro de solicitação', err)); 
 
      /* .then((response) =>{
         const status = response.status;

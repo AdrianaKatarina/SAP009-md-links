@@ -1,4 +1,6 @@
 import { readFile } from 'node:fs';
+import { readdirSync } from 'node:fs';
+import { extname } from 'node:path';
 /* import { validateFuncions } from './validate.js' */
 
 export const extrairInformacoes = (string, arquivo) => {
@@ -31,7 +33,7 @@ export const mdLinks = (caminhoDoArquivo, options) => {
              return result 
             })
             console.log('t', t)
-        }); */
+        });
         
         /* const validate = validateFuncions(informacoes); */
         /* validate.map((item) => console.log('item', item)) */
@@ -39,23 +41,23 @@ export const mdLinks = (caminhoDoArquivo, options) => {
         /* console.log('retorno md-links ', validate)
         resolve(validate);
       }else { */
-        resolve(informacoes)
+      resolve(informacoes)
       /* } */
        
     });
   });
 };
 
-//path.extname(path)
-//O path.extname()método retorna a extensão do path, desde a última ocorrência do .caractere (ponto) até o final da string na última parte do path.
+/* const filenames = readdirSync('./files');
+  
+console.log("\nCurrent directory filenames:");
+filenames.forEach(file => {
+  console.log(`=> ${file}`);
+});
 
-/* mdLinks("./some/example.md", { validate: true }) */
-
-//CLI md-links <path-to-file> [options] -> --validate
-
-// verificar se o link funciona ou não utilizando o protocolo http
-/* $ md-links ./some/example.md --validate
-./some/example.md http://algo.com/2/3/ ok 200 Link de algo
-./some/example.md https://outra-coisa-.net/algum-doc.html fail 404 algum doc
-./some/example.md http://google.com/ ok 301 Google */
+console.log("\Filenames with the .md extension:");
+filenames.forEach(file => {
+  if (extname(file) === ".md")
+    console.log(file);
+}) */
 

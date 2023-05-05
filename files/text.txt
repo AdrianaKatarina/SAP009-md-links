@@ -1,0 +1,1 @@
+O módulo exporta uma função com a interface (API) esperada.

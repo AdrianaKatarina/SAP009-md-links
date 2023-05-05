@@ -20,27 +20,24 @@ const options = {
 }).catch((err)=>{
     console.log(err);
 }) */
- if (options.validate && options.stats){
-  mdLinks(caminhoDoArquivo, {validate: true})
+
+if (options.validate && options.stats){
+  mdLinks(caminhoDoArquivo, options)
     .then((informacoes) => {
-      const links = informacoes.map((item) => item.href)
-      /* console.log(links) */
-      
+      const links = informacoes.map((item) => item.href);
       const broken = [];
       Promise.all(informacoes.map((item) =>
         fetch(item.href)
         .then((res) => {
           if(res.status !== 200){
-            /* console.log(item.href) */
             broken.push(item.href)
           }
         })
         .catch((err) => {
-          console.log(err);
+          broken.push(item.href)
         })
       ))
         .then(() => {
-          /* console.log(broken) */
           console.log(`Total: ${informacoes.length}`);
           console.log(`Unique: ${links.length}`);
           console.log(`Broken: ${broken.length}`);
@@ -55,11 +52,15 @@ const options = {
         informacoes.map((item) => {
           fetch(item.href)
             .then((res) => {
-              const status = res.status === 200 ? chalk.green('ok') : chalk.red('fail');
-              console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.yellow(status)} ${chalk.greenBright(res.status)} ${chalk.yellowBright(item.text)}`)
+              const status = res.status;
+              if(status === 200){
+                console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.yellow('ok')} ${chalk.greenBright(status)} ${chalk.yellowBright(item.text)}`)
+              }else{
+                console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.red('fail')} ${chalk.red(status)} ${chalk.yellowBright(item.text)}`)
+              }
             })
             .catch((err) => {
-              console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.red('fail')} ${chalk.red(err)} ${chalk.yellowBright(item.text)}`)
+              console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.gray('link não existe')} ${chalk.yellowBright(item.text)}`)
             })
         });
     }).catch((err)=>{
