@@ -13,6 +13,7 @@ const options = {
 if (options.validate && options.stats){
   mdLinks(caminhoDoArquivo, options)
     .then((result) => {
+      /* console.log(result) */
       const links = result.map((item) => item.href);
       const broken = result.filter((item) => item.status !== 200);
         console.log(`Total: ${result.length} \nUnique: ${links.length} \nBroken: ${broken.length}`);

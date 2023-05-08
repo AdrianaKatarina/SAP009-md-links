@@ -2,6 +2,8 @@ import { readFile } from 'node:fs';
 import { readdirSync } from 'node:fs';
 import { extname } from 'node:path';
 
+/* export const lerArquivo = (caminhoDoArquivo,encode) => readFile(caminhoDoArquivo,encode, (err, data)) */
+
 export const extrairInformacoes = (string, arquivo) => {
   if(!string && !arquivo) throw new Error('dados inválidos')
   const informacoes = string.split('](');
@@ -14,6 +16,32 @@ export const extrairInformacoes = (string, arquivo) => {
   };
 };
 
+export const validate = (informacoes) => {
+  return Promise.all(informacoes.map((item) =>
+    fetch(item.href)
+      .then((res) => {
+        item.status = res.status;
+        if(res.status !== 200){
+          item.message = 'FAIL'
+        } else {
+          item.message = res.statusText;
+        }
+        return item;
+      })
+      .catch((err) => {
+        item.status = err;
+        item.message = 'Esse link não existe';
+        return item;
+      })
+  ))
+}
+
+const calculoStats = (informacoes) => {
+  const total = informacoes.map((item) => item.href);
+  const unique = 
+
+}
+
 export const mdLinks = (caminhoDoArquivo, options) => {
   if(!caminhoDoArquivo) throw new Error('Parâmetro inválido')
   return new Promise((resolve, reject) => {
@@ -21,33 +49,16 @@ export const mdLinks = (caminhoDoArquivo, options) => {
     const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
     readFile(caminhoDoArquivo,encode, (err, data) => {
       if (err) throw reject(err);
-      const conteudo = data.match(regex);
-      const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
-      if(options.validate){
-        Promise.all(informacoes.map((item) =>
-          fetch(item.href)
-            .then((res) => {
-              item.status = res.status;
-              if(res.status !== 200){
-                item.message = 'FAIL'
-              } else {
-                item.message = res.statusText;
-              }
-              return item;
-            })
-            .catch((err) => {
-              item.status = err;
-              item.message = 'Esse link não existe';
-              return item;
-            })
-        ))
-          .then(resolve)
-      }else{
-        resolve(informacoes);
-      }
-        
-    });
-  });
+        const conteudo = data.match(regex);
+        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+        if(options.validate){
+          validate(informacoes)
+            .then(resolve)
+        }else{
+          resolve(informacoes);
+        }
+    })
+   });
 };
 
 /* const filenames = readdirSync('./files');
