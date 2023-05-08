@@ -18,17 +18,6 @@ export const validateFuncions = (informacoes) => {
     .catch(err => console.log('Erro de solicitação', err))
 }
 
-/* export const extrairInformacoes = (string, arquivo) => {
-  const informacoes = string.split('](');
-  const texto = informacoes[0].replace('[', '');
-  const link = informacoes[1].replace(')', '');
-  return {
-    href: link,
-    text: texto,
-    file: arquivo,
-  };
-}; */
-
 // Solicitação GET.
 fetch('https://nodejs.or/')
     .then(response => console.log(response.status))

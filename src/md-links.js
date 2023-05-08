@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs';
 import { readdirSync } from 'node:fs';
 import { extname } from 'node:path';
-/* import { validateFuncions } from './validate.js' */
 
 export const extrairInformacoes = (string, arquivo) => {
   if(!string && !arquivo) throw new Error('dados inválidos')
@@ -24,26 +23,29 @@ export const mdLinks = (caminhoDoArquivo, options) => {
       if (err) throw reject(err);
       const conteudo = data.match(regex);
       const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
-      /* informacoes.map((item) => console.log('item', item.href)) */
-      /* console.log('info md-links', informacoes) */
-      /* if(options.validate){
-        const validate = informacoes.map((item) => {
-          const t = validateFuncions(item)
-            .then((result) => { 
-             return result 
+      if(options.validate){
+        Promise.all(informacoes.map((item) =>
+          fetch(item.href)
+            .then((res) => {
+              item.status = res.status;
+              if(res.status !== 200){
+                item.message = 'FAIL'
+              } else {
+                item.message = res.statusText;
+              }
+              return item;
             })
-            console.log('t', t)
-        });
+            .catch((err) => {
+              item.status = err;
+              item.message = 'Esse link não existe';
+              return item;
+            })
+        ))
+          .then(resolve)
+      }else{
+        resolve(informacoes);
+      }
         
-        /* const validate = validateFuncions(informacoes); */
-        /* validate.map((item) => console.log('item', item)) */
-        /* return validate */
-        /* console.log('retorno md-links ', validate)
-        resolve(validate);
-      }else { */
-      resolve(informacoes)
-      /* } */
-       
     });
   });
 };
@@ -59,5 +61,5 @@ console.log("\Filenames with the .md extension:");
 filenames.forEach(file => {
   if (extname(file) === ".md")
     console.log(file);
-}) */
-
+})
+ */
