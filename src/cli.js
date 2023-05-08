@@ -15,8 +15,9 @@ if (options.validate && options.stats){
     .then((result) => {
       /* console.log(result) */
       const links = result.map((item) => item.href);
-      const broken = result.filter((item) => item.status !== 200);
-        console.log(`Total: ${result.length} \nUnique: ${links.length} \nBroken: ${broken.length}`);
+      const unique = new Set(links).size;
+      const broken = result.filter((item) => item.status !== 200).length;
+        console.log(`Total: ${links.length} \nUnique: ${unique} \nBroken: ${broken}`);
       })
     .catch((err) => {
       console.log(err);

@@ -37,9 +37,18 @@ export const validate = (informacoes) => {
 }
 
 const calculoStats = (informacoes) => {
-  const total = informacoes.map((item) => item.href);
-  const unique = 
-
+  console.log(informacoes)
+  const links = informacoes.map((item) => item.href);
+  const total = links.length;
+  //O new Set() serve para tirar valores repetidos de uma array;
+  const unique = new Set(links).size;
+  const broken = informacoes.filter((item) => item.status !== 200).length;
+  console.log('show', broken)
+  return {
+    total,
+    unique,
+    broken
+  }
 }
 
 export const mdLinks = (caminhoDoArquivo, options) => {
@@ -50,7 +59,7 @@ export const mdLinks = (caminhoDoArquivo, options) => {
     readFile(caminhoDoArquivo,encode, (err, data) => {
       if (err) throw reject(err);
         const conteudo = data.match(regex);
-        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));
+        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));  
         if(options.validate){
           validate(informacoes)
             .then(resolve)

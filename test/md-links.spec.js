@@ -1,4 +1,4 @@
-import { extrairInformacoes, mdLinks } from '../src/md-links';
+import { extrairInformacoes, mdLinks, validate, calculoStats} from '../src/md-links';
 import { readFile } from 'node:fs';
 
 jest.mock('node:fs')
@@ -52,7 +52,39 @@ describe('função md-links', () => {
     
     
   })
-}) 
+})
+
+it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
+  const info = [
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md',
+      status: 200,
+      message: 'OK'
+    },
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md',
+      status: 200,
+      message: 'OK'
+    },
+    {
+      href: 'https://curriculum.laboratoria.la/pt/topics/javascript/05-objects/01-objec', 
+      text: 'Objetos em JavaScript',
+      file: 'text.md',
+      status: 404,
+      message: 'FAIL'
+    }
+  ];
+  const total = 3;
+  const unique = 2;
+  const broken = 1;
+  const calculo = calculoStats(info)
+
+  expect(calculo).toEqual({total, unique, broken})
+})
 
 /* test('the data is peanut butter', () => {
   return fetchData().then(data => {
