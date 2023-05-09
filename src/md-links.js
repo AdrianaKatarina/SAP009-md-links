@@ -1,6 +1,12 @@
-import { readFile } from 'node:fs';
-import { readdirSync } from 'node:fs';
+import { readFile, lstatSync, readdirSync} from 'node:fs';
 import { extname } from 'node:path';
+
+/* Tenho que checar se o caminho é do diretorio ou arquivo Os objetos retornados de fs.stat() e fs.lstat() são desse tipo. (stats.isFile()
+stats.isDirectory()) */
+//Vai me retornar um booleano.
+export const isDirectory = (path) => lstatSync(path).isDirectory();
+export const isFile = (path) => lstatSync(path).isFile();
+
 
 /* export const lerArquivo = (caminhoDoArquivo,encode) => readFile(caminhoDoArquivo,encode, (err, data)) */
 
@@ -36,7 +42,7 @@ export const validate = (informacoes) => {
   ))
 }
 
-const calculoStats = (informacoes) => {
+export const calculoStats = (informacoes) => {
   console.log(informacoes)
   const links = informacoes.map((item) => item.href);
   const total = links.length;
@@ -52,22 +58,54 @@ const calculoStats = (informacoes) => {
 }
 
 export const mdLinks = (caminhoDoArquivo, options) => {
-  if(!caminhoDoArquivo) throw new Error('Parâmetro inválido')
-  return new Promise((resolve, reject) => {
-    const encode = 'utf-8';
-    const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
-    readFile(caminhoDoArquivo,encode, (err, data) => {
-      if (err) throw reject(err);
-        const conteudo = data.match(regex);
-        const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));  
-        if(options.validate){
-          validate(informacoes)
-            .then(resolve)
-        }else{
-          resolve(informacoes);
-        }
-    })
-   });
+  if(!caminhoDoArquivo) throw new Error('Parâmetro inválido');
+  /* console.log(isDirectory(caminhoDoArquivo));
+  console.log(isFile(caminhoDoArquivo)); */
+  //Se igual a file
+  if(isFile(caminhoDoArquivo)){
+    //termina com a extensão .md
+    if(extname(caminhoDoArquivo) !== '.md') throw new Error('Extensão inválida');
+    return new Promise((resolve, reject) => {
+      const encode = 'utf-8';
+      const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
+      readFile(caminhoDoArquivo,encode, (err, data) => {
+        if (err) throw reject(err);
+          const conteudo = data.match(regex);
+          const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));  
+          if(options.validate){
+            validate(informacoes)
+              .then(resolve)
+          }else{
+            resolve(informacoes);
+          }
+      })
+    });
+  }else if(isDirectory(caminhoDoArquivo)){
+    
+    //Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
+    const files = readdirSync(caminhoDoArquivo)
+    const fileMd = files.filter((item) => extname(item) === '.md')
+    /* console.log('arquivo md:', fileMd); */
+    //Agora é formar um caminho do arquivo
+    const directoryName = caminhoDoArquivo;
+    console.log('nome do diretorio:', directoryName)
+    const filePathMd = `${directoryName}/${fileMd}`;
+    return new Promise((resolve, reject) => {
+      const encode = 'utf-8';
+      const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
+      readFile(filePathMd,encode, (err, data) => {
+        if (err) throw reject(err);
+          const conteudo = data.match(regex);
+          const informacoes = conteudo.map((item) => extrairInformacoes(item, filePathMd));  
+          if(options.validate){
+            validate(informacoes)
+              .then(resolve)
+          }else{
+            resolve(informacoes);
+          }
+      })
+    });
+  }
 };
 
 /* const filenames = readdirSync('./files');
@@ -83,3 +121,6 @@ filenames.forEach(file => {
     console.log(file);
 })
  */
+
+ //MÉTODO fs.lstatSync(path) -> Retorna uma instância de fs.Stats.
+//Classe: fs.Stats -> stats.isFile() ou stats.isDirectory()

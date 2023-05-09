@@ -1,7 +1,17 @@
-import { extrairInformacoes, mdLinks, validate, calculoStats} from '../src/md-links';
-import { readFile } from 'node:fs';
+import { 
+extrairInformacoes,
+mdLinks,
+validate, 
+calculoStats, 
+isDirectory,
+isFile
+} from '../src/md-links';
+
+import { readFile, lstatSync } from 'node:fs';
+import { extname } from 'node:path';
 
 jest.mock('node:fs')
+jest.mock('node:path')
 
 describe('função extrairInformacoes', () => {
   it('Deve retornar a formatação link, texto e arquivo ', () => {
@@ -78,13 +88,46 @@ it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
       message: 'FAIL'
     }
   ];
-  const total = 3;
-  const unique = 2;
-  const broken = 1;
+  const resultado = {
+    total: 3,
+    unique: 2,
+    broken: 1
+  }
+  
   const calculo = calculoStats(info)
 
-  expect(calculo).toEqual({total, unique, broken})
+  expect(calculo).toEqual(resultado)
 })
+
+it('deve retornar true quando o caminho for diretorio', () => {
+  const path = 'file';
+  isDirectory(path)
+  //https://jestjs.io/pt-BR/docs/mock-function-api#mockfnmockreturnvaluevalue
+  expect(lstatSync).toHaveBeenCalledTimes(1);
+  expect(lstatSync).toHaveBeenCalledWith(path)
+})
+
+it('deve retornar true quando o caminho for do arquivo', () => {
+  const path = 'text.md';
+
+  isFile(path)
+
+  expect(lstatSync).toHaveBeenCalledTimes(1);
+  expect(lstatSync).toHaveBeenCalledWith(path)
+})
+
+it('deve retornar um erro quando o arquivo não tiver extensão .md', () => {
+  const path = 'text.html';
+  const options = {
+    validate: false,
+    stats: false
+  };
+  mdLinks(path, options);
+  
+  expect(extname).toHaveBeenCalledTimes(1);
+  expect(extname).toHaveBeenCalledWith(path)
+})
+
 
 /* test('the data is peanut butter', () => {
   return fetchData().then(data => {
