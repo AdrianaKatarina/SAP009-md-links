@@ -10,6 +10,43 @@ export const isFile = (path) => lstatSync(path).isFile();
 
 /* export const lerArquivo = (path,encode) => readFile(path, encode, (err, data)) */
 //promises.readFile
+export const readingFile = (path, options) => {
+  const encode = 'utf-8';
+  const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
+  return promises.readFile(path, encode)
+    .then((data) =>{
+      const arrLinks = data.match(regex);
+
+      if(arrLinks === null) throw new Error('Arquivo sem link');
+      const informacoes = arrLinks.map((item) => extractInformation(item, path))
+      return checkOptions(informacoes, options)
+    })
+    .catch((err) => {
+      return err
+    })
+}
+
+export const checkOptions = (data, options) => {
+  if(options.validate && options.stats){
+    return validate(data)
+      .then((response) => {
+        return calculateStats(response)
+      })
+  }else if(options.validate){
+    return validate(data)
+      .then((response) => {
+        return response
+      })
+  }else if(options.stats){
+    return validate(data)
+      .then((response) => {
+        return calculateStats(response)
+      })
+  }
+  else{
+    return data
+  }
+}
 
 export const extractInformation = (string, pathFile) => {
   /* if(!string && !pathFile) throw new Error('Dados inválidos') */
@@ -45,13 +82,11 @@ export const validate = (data) => {
 }
 
 export const calculateStats = (data) => {
-  /* console.log(data) */
   const links = data.map((item) => item.href);
   const total = links.length;
   //O new Set() serve para tirar valores repetidos de uma array;
   const unique = new Set(links).size;
   const broken = data.filter((item) => item.status !== 200).length;
-  /* console.log('show', broken) */
   return {
     total,
     unique,
@@ -63,44 +98,11 @@ export const mdLinks = (path, options) => {
   if(!path) throw new Error('Parâmetro inválido');
   /* console.log(isDirectory(path));
   console.log(isFile(path)); */
-  //Se igual a file
   if(isFile(path)){
-    //termina com a extensão .md
     if(extname(path) !== '.md') throw new Error('Extensão inválida');
-    return new Promise((resolve, reject) => {
-      const encode = 'utf-8';
-      const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
-      readFile(path,encode, (err, data) => {
-        if (err) throw reject(err);
-        const arrLinks = data.match(regex);
-        //quando não tem link retorna null
-        //quando tem link retorna o arrLinks
-        /* console.log('cont', arrLinks); */
-        if(arrLinks === null) throw new Error('Arquivo sem link');
-        const informacoes = arrLinks.map((item) => extractInformation(item, path));
-        if(options.validate && options.stats){
-          validate(informacoes)
-            .then((response) => {
-              resolve(calculateStats(response))
-            })
-        }else if(options.validate){
-          validate(informacoes)
-            .then(resolve)
-        }else if(options.stats){
-          validate(informacoes)
-            .then((response) => {
-              resolve(calculateStats(response))
-            })
-        }
-        else{
-          resolve(informacoes);
-        }
-      })
-    });
+    return readingFile(path, options);
   }else if(isDirectory(path)){
-    
     //Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
-    
     //Saber se tem +pastas
     let pathFile;
     const createPathFile = (path) => {
