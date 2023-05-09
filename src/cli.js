@@ -13,11 +13,7 @@ const options = {
 if (options.validate && options.stats){
   mdLinks(caminhoDoArquivo, options)
     .then((result) => {
-      /* console.log(result) */
-      const links = result.map((item) => item.href);
-      const unique = new Set(links).size;
-      const broken = result.filter((item) => item.status !== 200).length;
-        console.log(`Total: ${links.length} \nUnique: ${unique} \nBroken: ${broken}`);
+        console.log(`Total: ${result.total} \nUnique: ${result.unique} \nBroken: ${result.broken}`);
       })
     .catch((err) => {
       console.log(err);
@@ -37,16 +33,15 @@ if (options.validate && options.stats){
     })
 }else if (options.stats){
   mdLinks(caminhoDoArquivo, options)
-    .then((informacoes) => {
-      const links = informacoes.map((item) => item.link);
-      console.log(`Total: ${informacoes.length} \nUnique: ${links.length}`);
+    .then((result) => {
+      console.log(`Total: ${result.total} \nUnique: ${result.unique}\nBroken: ${result.broken}`);
     }).catch((err) => {
       console.log(err);
     });
 }else{
   mdLinks(caminhoDoArquivo, options)
-    .then((informacoes) => {
-      informacoes.map((item) => {
+    .then((result) => {
+      result.map((item) => {
         console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.yellowBright(item.text)}`)
       });
     }).catch((err) => {

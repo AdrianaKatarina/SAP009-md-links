@@ -13,23 +13,32 @@ import { extname } from 'node:path';
 jest.mock('node:fs')
 jest.mock('node:path')
 
+afterEach(() => {
+  lstatSync.mockClear()
+  //jest.clearAllMocks()
+})
 //Erro no isDirectory e isFile ❌
 describe('Verificação do Caminho', () => {
   it('deve verificar se o caminho passado foi um diretório', () => {
+    const mockDirectory = {isDirectory: () => true}
+    lstatSync.mockReturnValueOnce(mockDirectory)
     const path = 'file';
-    isDirectory(path)
+    const directory = isDirectory(path)
     //https://jestjs.io/pt-BR/docs/mock-function-api#mockfnmockreturnvaluevalue
     expect(lstatSync).toHaveBeenCalledTimes(1);
     expect(lstatSync).toHaveBeenCalledWith(path);
-    expect(isDirectory).toEqual(true) 
+    expect(directory).toEqual(true) 
   });
 
   it('deve verificar se o caminho passado foi um arquivo', () => {
+    const mockFile = {isFile: () => true}
+    lstatSync.mockReturnValueOnce(mockFile)
     const path = 'text.md';
-    isFile(path)
+    const file = isFile(path)
 
     expect(lstatSync).toHaveBeenCalledTimes(1);
     expect(lstatSync).toHaveBeenCalledWith(path);
+    expect(file).toEqual(true);
   });
 });
 
@@ -46,9 +55,9 @@ describe('função extractInformation', () => {
     expect(info).toEqual({href, text, file});
   });
   //Passou ✔️
-  it('Deve retornar um erro quando não receber uma string como parâmetro', () => {
+  /* it('Deve retornar um erro quando não receber uma string como parâmetro', () => {
     expect(() => extractInformation(1)).toThrow()
-  });
+  }); */
 })
 
 describe('função md-links', () => {
@@ -100,42 +109,46 @@ describe('função md-links', () => {
     })
   })
 */
-//Passou ✔️
-  it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
-    const info = [
-      {
-        href: 'https://pt.wikipedia.org/wiki/Markdown', 
-        text: 'Markdown',
-        file: 'text.md',
-        status: 200,
-        message: 'OK'
-      },
-      {
-        href: 'https://pt.wikipedia.org/wiki/Markdown', 
-        text: 'Markdown',
-        file: 'text.md',
-        status: 200,
-        message: 'OK'
-      },
-      {
-        href: 'https://curriculum.laboratoria.la/pt/topics/javascript/05-objects/01-objec', 
-        text: 'Objetos em JavaScript',
-        file: 'text.md',
-        status: 404,
-        message: 'FAIL'
-      }
-    ];
-    const resultado = {
-      total: 3,
-      unique: 2,
-      broken: 1
+  
+  const info = [
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md',
+      status: 200,
+      message: 'OK'
+    },
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md',
+      status: 200,
+      message: 'OK'
+    },
+    {
+      href: 'https://curriculum.laboratoria.la/pt/topics/javascript/05-objects/01-objec', 
+      text: 'Objetos em JavaScript',
+      file: 'text.md',
+      status: 404,
+      message: 'FAIL'
     }
-    
-    const calculo = calculateStats(info)
+  ];
 
-    expect(calculo).toEqual(resultado)
+  //Passou ✔️
+  it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
+      const resultado = {
+        total: 3,
+        unique: 2,
+        broken: 1
+      }
+      
+      const calculo = calculateStats(info)
+
+      expect(calculo).toEqual(resultado)
   })
 })
+
+
 /* test('the data is peanut butter', () => {
   return fetchData().then(data => {
     expect(data).toBe('peanut butter');

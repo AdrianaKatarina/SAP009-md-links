@@ -1,16 +1,18 @@
-import { readFile, lstatSync, readdirSync} from 'node:fs';
+import { readFile, lstatSync, readdirSync, promises } from 'node:fs';
 import { extname } from 'node:path';
 
-/* Tenho que checar se o caminho é do diretorio ou arquivo Os objetos retornados de fs.stat() e fs.lstat() são desse tipo. (stats.isFile()
-stats.isDirectory()) */
+/* Tenho que checar se o caminho é do diretorio ou arquivo.
+O retorno de fs.lstatSync() são uma instancia de fs.stats.isFile()
+fs.stats.isDirectory()) */
 //Vai me retornar um booleano.
 export const isDirectory = (path) => lstatSync(path).isDirectory();
 export const isFile = (path) => lstatSync(path).isFile();
 
 /* export const lerArquivo = (path,encode) => readFile(path, encode, (err, data)) */
+//promises.readFile
 
 export const extractInformation = (string, pathFile) => {
-  if(!string && !pathFile) throw new Error('Dados inválidos')
+  /* if(!string && !pathFile) throw new Error('Dados inválidos') */
   /* console.log(string) */
   const separate = string.split('](');
   const text = separate[0].replace('[', '');
@@ -43,13 +45,13 @@ export const validate = (data) => {
 }
 
 export const calculateStats = (data) => {
-  console.log(data)
+  /* console.log(data) */
   const links = data.map((item) => item.href);
   const total = links.length;
   //O new Set() serve para tirar valores repetidos de uma array;
   const unique = new Set(links).size;
   const broken = data.filter((item) => item.status !== 200).length;
-  console.log('show', broken)
+  /* console.log('show', broken) */
   return {
     total,
     unique,
@@ -75,11 +77,22 @@ export const mdLinks = (path, options) => {
         //quando tem link retorna o arrLinks
         /* console.log('cont', arrLinks); */
         if(arrLinks === null) throw new Error('Arquivo sem link');
-        const informacoes = arrLinks.map((item) => extractInformation(item, path));  
-        if(options.validate){
+        const informacoes = arrLinks.map((item) => extractInformation(item, path));
+        if(options.validate && options.stats){
+          validate(informacoes)
+            .then((response) => {
+              resolve(calculateStats(response))
+            })
+        }else if(options.validate){
           validate(informacoes)
             .then(resolve)
-        }else{
+        }else if(options.stats){
+          validate(informacoes)
+            .then((response) => {
+              resolve(calculateStats(response))
+            })
+        }
+        else{
           resolve(informacoes);
         }
       })
@@ -87,17 +100,35 @@ export const mdLinks = (path, options) => {
   }else if(isDirectory(path)){
     
     //Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
-    const files = readdirSync(path)
-    const fileMd = files.filter((item) => extname(item) === '.md')
+    
+    //Saber se tem +pastas
+    let pathFile;
+    const createPathFile = (path) => {
+      const files = readdirSync(path)
+      files.forEach((item) => {
+      //juntar
+        const formation = `${path}/${item}`
+        if(item === isDirectory){
+          return createPathFile(formation)
+        }else if(item === isFile) {
+          if(extname(item) !== '.md') throw new Error('Extensão inválida');
+          return pathFile = formation
+        }
+      })
+    }
+    createPathFile(path);
+    console.log('nome do diretorio:', pathFile)
+    /* const fileMd = files.filter((item) => ) */
     /* console.log('arquivo md:', fileMd); */
     //Agora é formar um caminho do arquivo
-    const directoryName = path;
-    console.log('nome do diretorio:', directoryName)
-    const filePathMd = `${directoryName}/${fileMd}`;
+    /* const directoryName = path; */
+    /* console.log('nome do diretorio:', directoryName) */
+
+    /* const filePathMd = `${directoryName}/${fileMd}`; */
     return new Promise((resolve, reject) => {
       const encode = 'utf-8';
       const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
-      readFile(filePathMd,encode, (err, data) => {
+      readFile(pathFile,encode, (err, data) => {
         if (err) throw reject(err);
           const conteudo = data.match(regex);
           const informacoes = conteudo.map((item) => extractInformation(item, filePathMd));  
