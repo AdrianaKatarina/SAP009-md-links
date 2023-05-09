@@ -7,23 +7,23 @@ stats.isDirectory()) */
 export const isDirectory = (path) => lstatSync(path).isDirectory();
 export const isFile = (path) => lstatSync(path).isFile();
 
+/* export const lerArquivo = (path,encode) => readFile(path, encode, (err, data)) */
 
-/* export const lerArquivo = (caminhoDoArquivo,encode) => readFile(caminhoDoArquivo,encode, (err, data)) */
-
-export const extrairInformacoes = (string, arquivo) => {
-  if(!string && !arquivo) throw new Error('dados inválidos')
-  const informacoes = string.split('](');
-  const texto = informacoes[0].replace('[', '');
-  const link = informacoes[1].replace(')', '');
+export const extractInformation = (string, pathFile) => {
+  if(!string && !pathFile) throw new Error('Dados inválidos')
+  /* console.log(string) */
+  const separate = string.split('](');
+  const text = separate[0].replace('[', '');
+  const href = separate[1].replace(')', '');
   return {
-    href: link,
-    text: texto,
-    file: arquivo,
+    href,
+    text,
+    file: pathFile,
   };
 };
 
-export const validate = (informacoes) => {
-  return Promise.all(informacoes.map((item) =>
+export const validate = (data) => {
+  return Promise.all(data.map((item) =>
     fetch(item.href)
       .then((res) => {
         item.status = res.status;
@@ -42,13 +42,13 @@ export const validate = (informacoes) => {
   ))
 }
 
-export const calculoStats = (informacoes) => {
-  console.log(informacoes)
-  const links = informacoes.map((item) => item.href);
+export const calculateStats = (data) => {
+  console.log(data)
+  const links = data.map((item) => item.href);
   const total = links.length;
   //O new Set() serve para tirar valores repetidos de uma array;
   const unique = new Set(links).size;
-  const broken = informacoes.filter((item) => item.status !== 200).length;
+  const broken = data.filter((item) => item.status !== 200).length;
   console.log('show', broken)
   return {
     total,
@@ -57,37 +57,41 @@ export const calculoStats = (informacoes) => {
   }
 }
 
-export const mdLinks = (caminhoDoArquivo, options) => {
-  if(!caminhoDoArquivo) throw new Error('Parâmetro inválido');
-  /* console.log(isDirectory(caminhoDoArquivo));
-  console.log(isFile(caminhoDoArquivo)); */
+export const mdLinks = (path, options) => {
+  if(!path) throw new Error('Parâmetro inválido');
+  /* console.log(isDirectory(path));
+  console.log(isFile(path)); */
   //Se igual a file
-  if(isFile(caminhoDoArquivo)){
+  if(isFile(path)){
     //termina com a extensão .md
-    if(extname(caminhoDoArquivo) !== '.md') throw new Error('Extensão inválida');
+    if(extname(path) !== '.md') throw new Error('Extensão inválida');
     return new Promise((resolve, reject) => {
       const encode = 'utf-8';
       const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
-      readFile(caminhoDoArquivo,encode, (err, data) => {
+      readFile(path,encode, (err, data) => {
         if (err) throw reject(err);
-          const conteudo = data.match(regex);
-          const informacoes = conteudo.map((item) => extrairInformacoes(item, caminhoDoArquivo));  
-          if(options.validate){
-            validate(informacoes)
-              .then(resolve)
-          }else{
-            resolve(informacoes);
-          }
+        const arrLinks = data.match(regex);
+        //quando não tem link retorna null
+        //quando tem link retorna o arrLinks
+        /* console.log('cont', arrLinks); */
+        if(arrLinks === null) throw new Error('Arquivo sem link');
+        const informacoes = arrLinks.map((item) => extractInformation(item, path));  
+        if(options.validate){
+          validate(informacoes)
+            .then(resolve)
+        }else{
+          resolve(informacoes);
+        }
       })
     });
-  }else if(isDirectory(caminhoDoArquivo)){
+  }else if(isDirectory(path)){
     
     //Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
-    const files = readdirSync(caminhoDoArquivo)
+    const files = readdirSync(path)
     const fileMd = files.filter((item) => extname(item) === '.md')
     /* console.log('arquivo md:', fileMd); */
     //Agora é formar um caminho do arquivo
-    const directoryName = caminhoDoArquivo;
+    const directoryName = path;
     console.log('nome do diretorio:', directoryName)
     const filePathMd = `${directoryName}/${fileMd}`;
     return new Promise((resolve, reject) => {
@@ -96,7 +100,7 @@ export const mdLinks = (caminhoDoArquivo, options) => {
       readFile(filePathMd,encode, (err, data) => {
         if (err) throw reject(err);
           const conteudo = data.match(regex);
-          const informacoes = conteudo.map((item) => extrairInformacoes(item, filePathMd));  
+          const informacoes = conteudo.map((item) => extractInformation(item, filePathMd));  
           if(options.validate){
             validate(informacoes)
               .then(resolve)
@@ -107,6 +111,23 @@ export const mdLinks = (caminhoDoArquivo, options) => {
     });
   }
 };
+
+//Caso options
+/* if (options.validate && options.stats){
+  Chamar o validate e passar como parametro na função stats.
+  Porque tem que retornar o stats com total,unique,broken
+}
+if (options.validate){
+  Chamar o validate e retornar com as info+ status e message; 
+}
+if (options.stats){
+  Chamar o validate e passar como parametro na função stats.
+  Porque tem que retornar o stats com total e unique 
+} else{
+  se nenhuma dessa não tiver flags
+  retornar extractInformation
+}
+*/
 
 /* const filenames = readdirSync('./files');
   
