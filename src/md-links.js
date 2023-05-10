@@ -11,8 +11,8 @@ export const readingFile = (path, options) => {
     .then((data) =>{
       const arrLinks = data.match(regex);
       if(arrLinks === null) throw new Error('Arquivo sem link');
-      const informacoes = arrLinks.map((item) => extractInformation(item, path))
-      return checkOptions(informacoes, options)
+      const formatting = arrLinks.map((item) => extractInformation(item, path))
+      return checkOptions(formatting, options)
     })
     .catch((err) => {
       return err
@@ -43,7 +43,7 @@ export const checkOptions = (data, options) => {
 
 export const extractInformation = (string, pathFile) => {
   const separate = string.split('](');
-  const text = separate[0].replace('[', '');
+  const text = separate[0].replace('[', '')
   const href = separate[1].replace(')', '');
   return {
     href,

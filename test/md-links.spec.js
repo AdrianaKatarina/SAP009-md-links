@@ -184,7 +184,6 @@ describe('função extractInformation', () => {
 
 //8. Função calculeStats -> retornar total,unique,broken ✔️
 it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
-  
   const resultado = {
     total: 3,
     unique: 2,
@@ -192,7 +191,6 @@ it('deve retornar os valores totais, únicos e quebrados dos links' , () =>{
   }
   
   const calculo = calculateStats(info)
-
   expect(calculo).toEqual(resultado)
 })
 
@@ -205,36 +203,3 @@ describe('função md-links', () => {
   //10. Função Md-links: erro quando a extensão não for .md ❌
 
 });
-
-//----------------------------------------------------------------------------
-  //Erro ❌
-  /* it('deve retornar um erro quando o arquivo não tiver extensão .md', () => {
-    const path = 'text.html';
-    const options = {
-      validate: false,
-      stats: false
-    };
-    const md = mdLinks(path, options);
-    
-    expect(extname).toHaveBeenCalledTimes(1);
-    expect(extname).toHaveBeenCalledWith(path);
-    expect(md).toThrow();
-  }) */
-
-  //Erro ❌
-  /* it('deve retornar um erro quando arquivo não tiver link', () => {
-
-  });
-
-  
-  
-
-  
-})
-
-
-/* test('the data is peanut butter', () => {
-  return fetchData().then(data => {
-    expect(data).toBe('peanut butter');
-  });
-});*/

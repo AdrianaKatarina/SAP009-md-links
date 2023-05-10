@@ -14,4 +14,3 @@ com este formato em qualquer repositório (começando pelo tradicional
 
 [algum doc](https://outra-coisa-.net/algum-doc.html)
 [Google](http://google.com/)
-[Link de algo](http://algo.com/2/3/)
