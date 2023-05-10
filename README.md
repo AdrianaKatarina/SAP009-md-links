@@ -74,6 +74,7 @@ Essa será a saída no terminal:
 
 ## 5. Ferramentas utilizadas
 
+
 * Node.js
 * JavaScript
 * Git
