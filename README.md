@@ -25,7 +25,7 @@ Este projeto teve como objetivo principal criar uma ferramenta de linha de coman
 
 ## 2. Instalação da biblioteca
 
-Instale a biblioteca, através do comando: `npm i <nome-da-biblioteca>`
+Instale a biblioteca, através do comando: `npm i md-links-adriana-oliveira`
 
 ## 3. Guia de uso
 

@@ -1,4 +1,6 @@
-import { readFile, lstatSync, readdirSync, promises } from 'node:fs';
+import {
+  readFile, lstatSync, readdirSync, promises,
+} from 'node:fs';
 import { extname } from 'node:path';
 
 export const isDirectory = (path) => lstatSync(path).isDirectory();
@@ -8,42 +10,33 @@ export const readingFile = (path, options) => {
   const encode = 'utf-8';
   const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
   return promises.readFile(path, encode)
-    .then((data) =>{
+    .then((data) => {
       const arrLinks = data.match(regex);
-      if(arrLinks === null) throw new Error('Arquivo sem link');
-      const formatting = arrLinks.map((item) => extractInformation(item, path))
-      return checkOptions(formatting, options)
+      if (arrLinks === null) throw new Error('Arquivo sem link');
+      const formatting = arrLinks.map((item) => extractInformation(item, path));
+      return checkOptions(formatting, options);
     })
-    .catch((err) => {
-      return err
-    })
-}
+    .catch((err) => err);
+};
 
 export const checkOptions = (data, options) => {
-  if(options.validate && options.stats){
+  if (options.validate && options.stats) {
     return validate(data)
-      .then((response) => {
-        return calculateStats(response)
-      })
-  }else if(options.validate){
+      .then((response) => calculateStats(response));
+  } if (options.validate) {
     return validate(data)
-      .then((response) => {
-        return response
-      })
-  }else if(options.stats){
+      .then((response) => response);
+  } if (options.stats) {
     return validate(data)
-      .then((response) => {
-        return calculateStats(response)
-      })
+      .then((response) => calculateStats(response));
   }
-  else{
-    return data
-  }
-}
+
+  return data;
+};
 
 export const extractInformation = (string, pathFile) => {
   const separate = string.split('](');
-  const text = separate[0].replace('[', '')
+  const text = separate[0].replace('[', '');
   const href = separate[1].replace(')', '');
   return {
     href,
@@ -52,25 +45,21 @@ export const extractInformation = (string, pathFile) => {
   };
 };
 
-export const validate = (data) => {
-  return Promise.all(data.map((item) =>
-    fetch(item.href)
-      .then((res) => {
-        item.status = res.status;
-        if(res.status !== 200){
-          item.message = 'FAIL'
-        } else {
-          item.message = res.statusText;
-        }
-        return item;
-      })
-      .catch((err) => {
-        item.status = err.cause.code;
-        item.message = 'FAIL';
-        return item;
-      })
-  ))
-}
+export const validate = (data) => Promise.all(data.map((item) => fetch(item.href)
+  .then((res) => {
+    item.status = res.status;
+    if (res.status !== 200) {
+      item.message = 'FAIL';
+    } else {
+      item.message = res.statusText;
+    }
+    return item;
+  })
+  .catch((err) => {
+    item.status = err.cause.code;
+    item.message = 'FAIL';
+    return item;
+  })));
 
 export const calculateStats = (data) => {
   const links = data.map((item) => item.href);
@@ -80,22 +69,22 @@ export const calculateStats = (data) => {
   return {
     total,
     unique,
-    broken
-  }
-}
+    broken,
+  };
+};
 
 export const mdLinks = (path, options) => {
-  if(!path) throw new Error('Parâmetro inválido');
-  
-  if(isFile(path)){
-    if(extname(path) !== '.md') throw new Error('Extensão inválida');
+  if (!path) throw new Error('Parâmetro inválido');
+
+  if (isFile(path)) {
+    if (extname(path) !== '.md') throw new Error('Extensão inválida');
     return readingFile(path, options);
-  }else if(isDirectory(path)){
-    //Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
-    const openDirectory = readdirSync(path)
-    const fileMd = openDirectory.filter((item) => extname(item) === '.md')
+  } if (isDirectory(path)) {
+    // Ler os arquivos dentro da pasta. fs.readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
+    const openDirectory = readdirSync(path);
+    const fileMd = openDirectory.filter((item) => extname(item) === '.md');
     const directoryName = path;
     const filePathMd = `${directoryName}/${fileMd}`;
-    return readingFile(filePathMd, options)
+    return readingFile(filePathMd, options);
   }
 };
