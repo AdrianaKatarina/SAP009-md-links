@@ -3,10 +3,9 @@
 ## Índice
 
 * [1. Sobre o projeto](#1-sobre-o-projeto)
-* [2. Backlog](#2-backlog)
-* [3. Instalação da biblioteca](#3-instalação-da-biblioteca)
-* [4. Guia de uso](#4-guia-de-uso)
-* [45. Ferramentas utilizadas](#5-ferramentas-utilizadas)
+* [2. Instalação da biblioteca](#2-instalação-da-biblioteca)
+* [3. Guia de uso](#3-guia-de-uso)
+* [4. Ferramentas utilizadas](#4-ferramentas-utilizadas)
 
 ***
 
@@ -24,16 +23,11 @@ informação que está ali.
 
 Este projeto teve como objetivo principal criar uma ferramenta de linha de comando (CLI) que possiblita a execução da biblioteca direta no terminal, a partir de um módulo do Node.js, que irá fazer a leitura e análise dos arquivos no formato `Markdown('.md')`, informando mediante uma verificação a existência de links e algumas estatísticas.
 
-## 2. Backlog 
-
-Para criação desse projeto, foi criado um fluxograma para auxiliar no planejamento das implementações da biblioteca.
-
-
-## 3. Instalação da biblioteca
+## 2. Instalação da biblioteca
 
 Instale a biblioteca, através do comando: `npm i <nome-da-biblioteca>`
 
-## 4. Guia de uso
+## 3. Guia de uso
 
 1. Com a biblioteca instalada, certifique de criar um arquivo `Markdown` com alguns [links](https://pt.wikipedia.org/wiki/Markdown).
 
@@ -80,7 +74,6 @@ Essa será a saída no terminal:
 
 ## 5. Ferramentas utilizadas
 
-* Figma(Fluxograma)
 * Node.js
 * JavaScript
 * Git
