@@ -21,12 +21,11 @@ if (options.validate && options.stats){
 }else if(options.validate){
   mdLinks(caminhoDoArquivo, options)
     .then((result) =>{
-      /* console.log(result) */
         result.map((item) => {
           if(item.status !== 200){
-            console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.red(item.message)} ${chalk.redBright(item.status)} ${chalk.yellowBright(item.text)}`)
+            console.log(`❌ ${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.red(item.message)} ${chalk.redBright(item.status)} ${chalk.yellowBright(item.text)}`)
           }else{
-            console.log(`${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.green(item.message)} ${chalk.greenBright(item.status)} ${chalk.yellowBright(item.text)}`)
+            console.log(`✔️  ${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.green(item.message)} ${chalk.greenBright(item.status)} ${chalk.yellowBright(item.text)}`)
           }          
         });
     }).catch((err)=>{

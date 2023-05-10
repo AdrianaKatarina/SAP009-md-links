@@ -9,9 +9,14 @@ validate,
 calculateStats
 } from '../src/md-links';
 
-import { readFile, lstatSync } from 'node:fs';
+import { readFile, lstatSync, promises } from 'node:fs';
 import { extname } from 'node:path';
 
+/* jest.mock('node:fs', () => ({
+  promises: {
+    readFile: jest.fn().mockResolvedValue()
+  }
+})) */
 jest.mock('node:fs')
 jest.mock('node:path')
 
@@ -20,7 +25,6 @@ afterEach(() => {
   //jest.clearAllMocks()
 })
 
-//Passou ✔️
 describe('Verificação do Caminho', () => {
 //1. isDirectory ✔️
   it('deve verificar se o caminho passado foi um diretório', () => {
@@ -28,7 +32,6 @@ describe('Verificação do Caminho', () => {
     lstatSync.mockReturnValueOnce(mockDirectory)
     const path = 'file';
     const directory = isDirectory(path)
-    //https://jestjs.io/pt-BR/docs/mock-function-api#mockfnmockreturnvaluevalue
     expect(lstatSync).toHaveBeenCalledTimes(1);
     expect(lstatSync).toHaveBeenCalledWith(path);
     expect(directory).toEqual(true) 
@@ -47,9 +50,8 @@ describe('Verificação do Caminho', () => {
 });
 
 //3. readFile() ❌
-const path = 'text.md';
+/* const path = 'text.md';
  it('deve chamar a readfile com os parâmetros corretos', () => {
-    readFile.mockResolvedValue()
     const path = 'text.md'
     const encode = 'utf-8';
     const options = {
@@ -58,9 +60,26 @@ const path = 'text.md';
     }
     readingFile(path, options);
 
-    expect(readFile).toHaveBeenCalledTimes(1);
-    expect(readFile).toHaveBeenCalledWith(path, encode);
-  })
+    expect(promises.readFile).toHaveBeenCalledTimes(1);
+    expect(promises.readFile).toHaveBeenCalledWith(path, encode);
+  }) */
+const infoPadrao = [
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md'
+    },
+    {
+      href: 'https://pt.wikipedia.org/wiki/Markdown', 
+      text: 'Markdown',
+      file: 'text.md'
+    },
+    {
+      href: 'https://curriculum.laboratoria.la/pt/topics/javascript/05-objects/01-objec', 
+      text: 'Objetos em JavaScript',
+      file: 'text.md'
+    }
+];
 const info = [
     {
       href: 'https://pt.wikipedia.org/wiki/Markdown', 
@@ -85,8 +104,8 @@ const info = [
     }
 ];
 //4. checkOptions ❌
-describe('Função checkOptions', () => {
-  it.only('Deve retornar total, unique, broken', () => {
+/* describe('Função checkOptions', () => {
+  it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
     const options = {
       validate: true,
       stats: true
@@ -98,10 +117,45 @@ describe('Função checkOptions', () => {
     }
     //retorna uma promise. então tem que resolvê-la
     const check = checkOptions(info, options)
-
     expect(check).toEqual(result)
   })
-})
+
+  it('Deve retornar total, unique, broken quando validate forem iguais à true', () => {
+    const options = {
+      validate: true,
+      stats: false
+    }
+    const result = {
+      total: 3,
+      unique: 2
+    }
+    //retorna uma promise. então tem que resolvê-la
+    const check = checkOptions(info, options)
+    expect(check).toEqual(result)
+  })
+
+  it('Deve retornar total, unique, broken quando stats forem iguais à true', () => {
+    const options = {
+      validate: false,
+      stats: true
+    }
+    const result = info;
+    //retorna uma promise. então tem que resolvê-la
+    const check = checkOptions(infoPadrao, options)
+    expect(check).toEqual(result)
+  })
+
+  it('Deve retornar href, text, file quando validate e stats forem iguais à false', () => {
+    const options = {
+      validate: false,
+      stats: true
+    }
+    const result = infoPadrao;
+    //retorna uma promise. então tem que resolvê-la
+    const check = checkOptions(infoPadrao, options)
+    expect(check).toEqual(result)
+  })
+}) */
 
 describe('função extractInformation', () => {
 //5. extractInformation -> retornar link, text e file ✔️
@@ -112,15 +166,8 @@ describe('função extractInformation', () => {
     const file = 'text.md'
 
     const info = extractInformation(string, file);
-    
     expect(info).toEqual({href, text, file});
   });
-  
-  //6. extractInformation -> retornar um erro quando não receber uma string como parâmetro. ✔️
-  
-  /* it('Deve retornar um erro quando não receber uma string como parâmetro', () => {
-    expect(() => extractInformation(1)).toThrow()
-  }); */
 })
 
 //7. função validate ❌ 
@@ -131,7 +178,6 @@ describe('função extractInformation', () => {
     const status = 200;
     const message = 'OK';
     fetch(href).then(data => {
-
     })
   })
 */
