@@ -11,5 +11,8 @@
         "sourceType": "module"
     },
     "rules": {
+        "import/extensions": 0,
+        "no-param-reassign": ["error", { "props": false }],
+        "linebreak-style": 0
     }
 }

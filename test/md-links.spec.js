@@ -1,5 +1,5 @@
-import { readFile, lstatSync, promises } from 'node:fs';
-import { extname } from 'node:path';
+import { lstatSync, promises } from 'node:fs';
+/* import { extname } from 'node:path'; */
 import {
   isDirectory,
   isFile,
@@ -7,16 +7,17 @@ import {
   checkOptions,
   extractInformation,
   mdLinks,
-  validate,
+  /* validate, */
   calculateStats,
 } from '../src/md-links';
 
-/* jest.mock('node:fs', () => ({
+jest.mock('node:fs', () => ({
+  lstatSync: jest.fn(),
   promises: {
     readFile: jest.fn().mockResolvedValue()
   }
-})) */
-jest.mock('node:fs');
+}))
+/* jest.mock('node:fs'); */
 jest.mock('node:path');
 
 afterEach(() => {
@@ -49,19 +50,28 @@ describe('Verificação do Caminho', () => {
 });
 
 // 3. readFile() ❌
-/* const path = 'text.md';
- it('deve chamar a readfile com os parâmetros corretos', () => {
-    const path = 'text.md'
+describe('função readingFile', () => {
+  const path = 'text.md';
+  it('deve chamar a readfile com os parâmetros corretos', () => {
     const encode = 'utf-8';
     const options = {
       validate: false,
-      stats: false
-    }
+      stats: false,
+    };
     readingFile(path, options);
 
     expect(promises.readFile).toHaveBeenCalledTimes(1);
     expect(promises.readFile).toHaveBeenCalledWith(path, encode);
-  }) */
+  });
+ /*  it('deve retornar um erro quando arquivo não tiver link', () => {
+    const options = {
+      validate: false,
+      stats: false,
+    };
+    expect(() => readingFile('./semlink.md', options)).toThrowError(new Error('Arquivo sem link'));
+  }); */
+});
+
 const infoPadrao = [
   {
     href: 'https://pt.wikipedia.org/wiki/Markdown',
@@ -103,18 +113,18 @@ const info = [
   },
 ];
 // 4. checkOptions ❌
-/* describe('Função checkOptions', () => {
-  it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
+describe('Função checkOptions', () => {
+/*   it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
     const options = {
       validate: true,
-      stats: true
+      stats: true,
     }
     const result = {
       total: 3,
       unique: 2,
       broken: 1
     }
-    //retorna uma promise. então tem que resolvê-la
+    // retorna uma promise. então tem que resolvê-la
     const check = checkOptions(info, options)
     expect(check).toEqual(result)
   })
@@ -122,39 +132,43 @@ const info = [
   it('Deve retornar total, unique, broken quando validate forem iguais à true', () => {
     const options = {
       validate: true,
-      stats: false
+      stats: false,
     }
     const result = {
       total: 3,
       unique: 2
     }
-    //retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(info, options)
-    expect(check).toEqual(result)
-  })
+    // retorna uma promise. então tem que resolvê-la
+    const check = checkOptions(info, options);
+    expect(check).toEqual(result);
+  }) */
 
-  it('Deve retornar total, unique, broken quando stats forem iguais à true', () => {
+  it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
     const options = {
       validate: false,
-      stats: true
-    }
-    const result = info;
-    //retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(infoPadrao, options)
-    expect(check).toEqual(result)
+      stats: true,
+    };
+    const result = {
+      broken: 1,
+      total: 3,
+      unique: 2,
+    };
+    // retorna uma promise. então tem que resolvê-la
+    const check = checkOptions(infoPadrao, options);
+    expect(check).toEqual(result);
   })
-
+  // ok
   it('Deve retornar href, text, file quando validate e stats forem iguais à false', () => {
     const options = {
       validate: false,
-      stats: true
-    }
+      stats: false,
+    };
     const result = infoPadrao;
-    //retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(infoPadrao, options)
-    expect(check).toEqual(result)
+
+    const check = checkOptions(result, options);
+    expect(check).toEqual(result);
   })
-}) */
+})
 
 describe('função extractInformation', () => {
 // 5. extractInformation -> retornar link, text e file ✔️
