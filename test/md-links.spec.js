@@ -3,7 +3,6 @@ import { lstatSync, promises } from 'node:fs';
 import {
   isDirectory,
   isFile,
-  
   readingFile,
   checkOptions,
   extractInformation,
