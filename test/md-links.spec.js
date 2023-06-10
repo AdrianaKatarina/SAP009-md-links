@@ -1,5 +1,4 @@
 import { lstatSync, promises } from 'node:fs';
-/* import { extname } from 'node:path'; */
 import {
   isDirectory,
   isFile,
@@ -7,69 +6,20 @@ import {
   checkOptions,
   extractInformation,
   mdLinks,
-  /* validate, */
   calculateStats,
 } from '../src/md-links';
 
 jest.mock('node:fs', () => ({
   lstatSync: jest.fn(),
   promises: {
-    readFile: jest.fn().mockResolvedValue()
-  }
-}))
-/* jest.mock('node:fs'); */
+    readFile: jest.fn().mockResolvedValue(),
+  },
+}));
+jest.mock('node:fs')
 jest.mock('node:path');
 
 afterEach(() => {
   lstatSync.mockClear();
-  // jest.clearAllMocks()
-});
-
-describe('Verificação do Caminho', () => {
-// 1. isDirectory ✔️
-  it('deve verificar se o caminho passado foi um diretório', () => {
-    const mockDirectory = { isDirectory: () => true };
-    lstatSync.mockReturnValueOnce(mockDirectory);
-    const path = 'file';
-    const directory = isDirectory(path);
-    expect(lstatSync).toHaveBeenCalledTimes(1);
-    expect(lstatSync).toHaveBeenCalledWith(path);
-    expect(directory).toEqual(true);
-  });
-  // 2. isFile ✔️
-  it('deve verificar se o caminho passado foi um arquivo', () => {
-    const mockFile = { isFile: () => true };
-    lstatSync.mockReturnValueOnce(mockFile);
-    const path = 'text.md';
-    const file = isFile(path);
-
-    expect(lstatSync).toHaveBeenCalledTimes(1);
-    expect(lstatSync).toHaveBeenCalledWith(path);
-    expect(file).toEqual(true);
-  });
-});
-
-// 3. readFile() ❌
-describe('função readingFile', () => {
-  const path = 'text.md';
-  it('deve chamar a readfile com os parâmetros corretos', () => {
-    const encode = 'utf-8';
-    const options = {
-      validate: false,
-      stats: false,
-    };
-    readingFile(path, options);
-
-    expect(promises.readFile).toHaveBeenCalledTimes(1);
-    expect(promises.readFile).toHaveBeenCalledWith(path, encode);
-  });
- /*  it('deve retornar um erro quando arquivo não tiver link', () => {
-    const options = {
-      validate: false,
-      stats: false,
-    };
-    expect(() => readingFile('./semlink.md', options)).toThrowError(new Error('Arquivo sem link'));
-  }); */
 });
 
 const infoPadrao = [
@@ -84,7 +34,7 @@ const infoPadrao = [
     file: 'text.md',
   },
   {
-    href: 'https://curriculum.laboratoria.la/pt/topics/javascript/05-objects/01-objec',
+    href: 'https://curriculum.labor.la/pt/topics/javascript/05-objects/01-objects',
     text: 'Objetos em JavaScript',
     file: 'text.md',
   },
@@ -112,38 +62,96 @@ const info = [
     message: 'FAIL',
   },
 ];
-// 4. checkOptions ❌
-describe('Função checkOptions', () => {
-/*   it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
+
+describe('Verificação do Caminho', () => {
+  it('deve verificar se o caminho passado foi um diretório', () => {
+    const mockDirectory = { isDirectory: () => true };
+    lstatSync.mockReturnValueOnce(mockDirectory);
+    const path = 'file';
+    const directory = isDirectory(path);
+    expect(lstatSync).toHaveBeenCalledTimes(1);
+    expect(lstatSync).toHaveBeenCalledWith(path);
+    expect(directory).toEqual(true);
+  });
+
+  it('deve verificar se o caminho passado foi um arquivo', () => {
+    const mockFile = { isFile: () => true };
+    lstatSync.mockReturnValueOnce(mockFile);
+    const path = 'text.md';
+    const file = isFile(path);
+
+    expect(lstatSync).toHaveBeenCalledTimes(1);
+    expect(lstatSync).toHaveBeenCalledWith(path);
+    expect(file).toEqual(true);
+  });
+});
+
+describe('Função readingFile', () => {
+  it('Deve chamar a função readfile com os parâmetros corretos', () => {
+    const encode = 'utf-8';
     const options = {
-      validate: true,
+      validate: false,
+      stats: false,
+    };
+
+    readingFile(info.file, options);
+
+    expect(promises.readFile).toHaveBeenCalledTimes(1);
+    expect(promises.readFile).toHaveBeenCalledWith(info.file, encode);
+  });
+});
+
+describe('Função checkOptions', () => {
+  it('Deve retornar informações sobre o total, unique e broken sobre os links quando somente o stats for igual à true', () => {
+    const options = {
+      validate: false,
       stats: true,
     }
     const result = {
       total: 3,
       unique: 2,
-      broken: 1
+      broken: 1,
     }
-    // retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(info, options)
-    expect(check).toEqual(result)
+    return checkOptions(infoPadrao, options).then((res) => {
+      expect(res).toEqual(result);
+    });
   })
 
-  it('Deve retornar total, unique, broken quando validate forem iguais à true', () => {
+ it('Deve retornar informações detalhada sobre cada link somente quando o validate for igual à true', () => {
     const options = {
       validate: true,
       stats: false,
     }
-    const result = {
-      total: 3,
-      unique: 2
-    }
-    // retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(info, options);
-    expect(check).toEqual(result);
-  }) */
+    const result = [
+      {
+        file: 'text.md',
+        href: 'https://pt.wikipedia.org/wiki/Markdown',
+        message: 'OK',
+        status: 200,
+        text: 'Markdown',
+      },
+      {
+        file: 'text.md',
+        href: 'https://pt.wikipedia.org/wiki/Markdown',
+        message: 'OK',
+        status: 200,
+        text: 'Markdown',
+      },      
+      {
+        file: 'text.md',
+        href: 'https://curriculum.labor.la/pt/topics/javascript/05-objects/01-objects',
+        message: 'FAIL',
+        status: 'ENOTFOUND',
+        text: 'Objetos em JavaScript',
+      }
+    ]
 
-  it('Deve retornar total, unique, broken quando validate e stats forem iguais à true', () => {
+    return checkOptions(infoPadrao, options).then((res) => {
+      expect(res).toEqual(result);
+    });
+  }) 
+
+  it('Deve retornar o total, unique, broken quando validate e stats forem iguais à true', () => {
     const options = {
       validate: false,
       stats: true,
@@ -153,11 +161,12 @@ describe('Função checkOptions', () => {
       total: 3,
       unique: 2,
     };
-    // retorna uma promise. então tem que resolvê-la
-    const check = checkOptions(infoPadrao, options);
-    expect(check).toEqual(result);
-  })
-  // ok
+    return checkOptions(infoPadrao, options).then((res) => {
+      expect(res).toEqual(result);
+    });
+    
+  });
+
   it('Deve retornar href, text, file quando validate e stats forem iguais à false', () => {
     const options = {
       validate: false,
@@ -167,11 +176,10 @@ describe('Função checkOptions', () => {
 
     const check = checkOptions(result, options);
     expect(check).toEqual(result);
-  })
-})
+  });
+});
 
 describe('função extractInformation', () => {
-// 5. extractInformation -> retornar link, text e file ✔️
   it('Deve retornar link, text e file', () => {
     const text = 'Markdown';
     const href = 'https://pt.wikipedia.org/wiki/Markdown';
@@ -183,33 +191,21 @@ describe('função extractInformation', () => {
   });
 });
 
-// 7. função validate ❌
-/* it('deve retornar ser adicionadas message e status', () => {
-    const href = 'https://pt.wikipedia.org/wiki/Markdown';
-    const text = 'Markdown';
-    const file = 'text.md';
-    const status = 200;
-    const message = 'OK';
-    fetch(href).then(data => {
-    })
-  })
-*/
+describe('Função calculeStats', () => {
+  it('Deve retornar os valores totais, únicos e quebrados dos links', () => {
+    const resultado = {
+      total: 3,
+      unique: 2,
+      broken: 1,
+    };
+  
+    const calculo = calculateStats(info);
+    expect(calculo).toEqual(resultado);
+  });
+})
 
-// 8. Função calculeStats -> retornar total,unique,broken ✔️
-it('deve retornar os valores totais, únicos e quebrados dos links', () => {
-  const resultado = {
-    total: 3,
-    unique: 2,
-    broken: 1,
-  };
-
-  const calculo = calculateStats(info);
-  expect(calculo).toEqual(resultado);
-});
-
-describe('função md-links', () => {
-  // 9. Função Md-links: erro quando não tiver parâmetro ✔️
+describe('Função md-links', () => {
   it('deve retornar um erro quando não tiver parâmetro', () => {
-    expect(() => mdLinks()).toThrow();
+    expect(() => mdLinks()).toThrow('Parâmetro inválido');
   });
 });

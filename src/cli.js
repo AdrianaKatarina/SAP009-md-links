@@ -22,8 +22,8 @@ if (options.validate && options.stats) {
   mdLinks(path, options)
     .then((result) => {
       result.map((item) => {
-        if (item.status !== 200) {
-          console.log(`❌ ${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.red(item.message)} ${chalk.redBright(item.status)} ${chalk.yellowBright(item.text)}`);
+        if (item.message !== 'OK') {
+          console.log(`❌ ${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.redBright(item.message)} ${chalk.magentaBright(item.status)} ${chalk.yellowBright(item.text)}`);
         } else {
           console.log(`✔️  ${chalk.blue(item.file)} ${chalk.cyanBright(item.href)} ${chalk.green(item.message)} ${chalk.greenBright(item.status)} ${chalk.yellowBright(item.text)}`);
         }

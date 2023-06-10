@@ -1,21 +1,15 @@
 import {
-  /* readFile, */ lstatSync, readdirSync, promises,
+  lstatSync, readdirSync, promises,
 } from 'node:fs';
 import { extname } from 'node:path';
 
-// testes ok
 export const isDirectory = (path) => lstatSync(path).isDirectory();
 export const isFile = (path) => lstatSync(path).isFile();
 
 export const validate = (data) => Promise.all(data.map((item) => fetch(item.href)
   .then((res) => {
-    /* console.log(res) */
     item.status = res.status;
-    if (res.status !== 200) {
-      item.message = 'FAIL';
-    } else {
-      item.message = res.statusText;
-    }
+    item.message = res.statusText;
     return item;
   })
   .catch((err) => {
@@ -23,7 +17,7 @@ export const validate = (data) => Promise.all(data.map((item) => fetch(item.href
     item.message = 'FAIL';
     return item;
   })));
-// testes ok
+
 export const calculateStats = (data) => {
   const links = data.map((item) => item.href);
   const total = links.length;
@@ -50,9 +44,9 @@ export const checkOptions = (data, options) => {
 
   return data;
 };
-// testes ok
-export const extractInformation = (string, pathFile) => {
-  const separate = string.split('](');
+
+export const extractInformation = (linkMarkdown, pathFile) => {
+  const separate = linkMarkdown.split('](');
   const text = separate[0].replace('[', '');
   const href = separate[1].replace(')', '');
   return {
@@ -61,7 +55,7 @@ export const extractInformation = (string, pathFile) => {
     file: pathFile,
   };
 };
-// testes verificação de chamada ok;
+
 export const readingFile = (path, options) => {
   const encode = 'utf-8';
   const regex = /\[[^\]]+\]\(([^)]+)\)/gm;
@@ -78,9 +72,7 @@ export const readingFile = (path, options) => {
 export const mdLinks = (path, options) => {
   if (!path) throw new Error('Parâmetro inválido');
 
-  /*  if (isFile(path)) {
-  } */ if (isDirectory(path)) {
-    // readdirSync(path[, options]) -> Retorna uma matriz de nomes de arquivos excluindo '.'e '..'.
+  if (isDirectory(path)) {
     const openDirectory = readdirSync(path);
     const fileMd = openDirectory.filter((item) => extname(item) === '.md');
     const directoryName = path;
